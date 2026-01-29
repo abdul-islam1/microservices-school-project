@@ -1,0 +1,62 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootp
+      MONGO_INITDB_DATABASE: kindergarten
+
+  employeeservice:
+    build: ./employeeservice
+    container_name: employee_container
+    ports:
+      - "5003:5003"
+    environment:
+      MONGODB_URI: mongodb://root:rootp@mongodb:27017/kindergarten?authSource=admin
+      DATABASE_NAME: kindergarten
+    depends_on:
+      - mongodb
+    
+  studentservice:
+    build: ./studentservice
+    container_name: student-container
+    ports:
+      - "5001:5001"
+    environment:
+      MONGODB_URI: mongodb://root:rootp@mongodb:27017/kindergarten?authSource=admin
+      DATABASE_NAME: kindergarten
+    depends_on:
+        - mongodb
+  
+  teacherservice:
+    build: ./teacherservice
+    container_name: teacher-container
+    ports:
+    - "5002:5002"
+    environment:
+      MONGODB_URI: mongodb://root:rootp@mongodb:27017/kindergarten?authSource=admin
+      DATABASE_NAME: kindergarten
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend
+    container_name: react-frontend
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - employeeservice
+      - studentservice
+      - teacherservice
+
+volumes:
+    mongo_data:
