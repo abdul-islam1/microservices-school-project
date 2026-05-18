@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-svc-deployment
+spec:
+  selector:
+    matchLabels:
+      app: student-svc
+  template:
+    metadata:
+      labels:
+        app: student-svc
+    spec:
+      containers:
+      - name: backend-conatiner
+        image: abdul1s/microsvc-school-project-student-svc:0.2
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5001
+        volumeMounts:
+          - mountPath: /app/logs/
+            name: student-svc-access-log-volume
+        env:
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: password
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: username
+          - name: DATABASE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: student-service-config
+                key: database_url
+      volumes:
+        - name: student-svc-access-log-volume
+          persistentVolumeClaim:
+            claimName: student-log-persistance
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-svc-clusterip
+spec:
+  selector:
+    app: student-svc
+  ports:
+  - port: 5001
+    targetPort: 5001

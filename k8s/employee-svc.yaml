@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-svc-deployment
+spec:
+  selector:
+    matchLabels:
+      app: employee-svc
+  template:
+    metadata:
+      labels:
+        app: employee-svc
+    spec:
+      containers:
+      - name: backend-conatiner
+        image: abdul1s/microsvc-school-project-employee-svc:0.2
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5003
+        volumeMounts:
+          - mountPath: /app/logs/
+            name: employee-svc-access-log-volume
+        env:
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: password
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: username
+          - name: DATABASE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: employee-service-config
+                key: database_url
+      volumes:
+        - name: employee-svc-access-log-volume
+          persistentVolumeClaim:
+            claimName: employee-log-persistance
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-svc-clusterip
+spec:
+  selector:
+    app: employee-svc
+  ports:
+  - port: 5003
+    targetPort: 5003

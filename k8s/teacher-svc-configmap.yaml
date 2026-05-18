@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: teacher-service-config
+data:
+  database_url: "mongodb:27017"
+  database_name: "kindergarten"

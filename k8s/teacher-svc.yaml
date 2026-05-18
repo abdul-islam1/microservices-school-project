@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teacher-svc-deployment
+spec:
+  selector:
+    matchLabels:
+      app: teacher-svc
+  template:
+    metadata:
+      labels:
+        app: teacher-svc
+    spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Exists"
+        effect: "NoSchedule"
+      containers:
+      - name: backend-conatiner
+        image: abdul1s/microsvc-school-project-teacher-svc:0.1
+        # resources:
+        #   limits:
+        #     memory: "256Mi"
+        #     cpu: "2000m"
+        ports:
+        - containerPort: 5002
+        volumeMounts:
+          - mountPath: /app/logs/
+            name: teacher-svc-access-log-volume
+        env:
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: password
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: username
+          - name: MONGODB_URI
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: mongodb_uri
+          - name: DATABASE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: teacher-service-config
+                key: database_url
+          - name: DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: teacher-service-config
+                key: database_name
+      volumes:
+        - name: teacher-svc-access-log-volume
+          persistentVolumeClaim:
+            claimName: teacher-log-persistance
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teacher-svc-clusterip
+spec:
+  selector:
+    app: teacher-svc
+  ports:
+  - port: 5002
+    targetPort: 5002
