@@ -9,7 +9,9 @@ db = None
 def connect_db():
     global client, db
 
-    mongodb_uri = os.getenv("MONGODB_URI")
+    mongodb_uri = "mongodb://"  + os.getenv("DATABASE_USERNAME") + ":" + os.getenv("DATABASE_PASSWORD") + "@" + os.getenv("DATABASE_URL") +"?authSource=admin"
+    # mongodb://root:rootp@mongodb:27017/kindergarten?authSource=admin
+   # mongodb_uri = os.getenv("MONGODB_URI")
     database_name = os.getenv("DATABASE_NAME", "kindergarten")
 
     if not mongodb_uri:

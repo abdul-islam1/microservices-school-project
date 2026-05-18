@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,7 +16,14 @@ var Database *mongo.Database
 
 func Connect() error {
 	// From Environment variables 
-	connectionString := os.Getenv("MONGODB_URI")
+	// connectionString := os.Getenv("MONGODB_URI")
+	connectionString := fmt.Sprintf(
+	"mongodb://%s:%s@%s?authSource=admin",
+	os.Getenv("DATABASE_USERNAME"),
+	os.Getenv("DATABASE_PASSWORD"),
+	os.Getenv("DATABASE_URL"),
+)
+	
 	// if connectionString == "" {
 	// 	connectionString = "mongodb://mongo:27017" // default value
 	// }

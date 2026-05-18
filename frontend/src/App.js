@@ -31,9 +31,9 @@ function App() {
   });
 
   // API Base URLs
-  const STUDENT_SERVICE_URL = "http://174.129.188.174:5001";
-  const TEACHER_SERVICE_URL = "http://174.129.188.174:5002";
-  const EMPLOYEE_SERVICE_URL = "http://174.129.188.174:5003";
+  const STUDENT_SERVICE_URL = "http://192.168.78.155/students";
+  const TEACHER_SERVICE_URL = "http://192.168.78.155/teachers";
+  const EMPLOYEE_SERVICE_URL = "http://192.168.78.155/employees";
 
   // ---------- Health Check ----------
   const checkService = async (url, key) => {
@@ -176,7 +176,7 @@ function App() {
     });
     fetchEmployees();
   };
-
+  console.log("Service Status:app running");
   return (
     <div style={{ padding: 20 }}>
       <h1>Kindergarten School Registry</h1>
